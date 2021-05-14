@@ -8,8 +8,8 @@ public class MonitorDeDisciplina extends Aluno {
         super();
     }
 
-    public MonitorDeDisciplina(long dre, String nome, Disciplina disciplina) {
-        super(dre, nome);
+    public MonitorDeDisciplina(long dre, String nome, int anoDeNascimento, Disciplina disciplina) {
+        super(dre, nome, anoDeNascimento);
         this.disciplina = disciplina;
     }
 
