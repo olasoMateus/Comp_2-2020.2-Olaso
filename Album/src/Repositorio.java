@@ -1,31 +1,22 @@
 import java.util.ArrayList;
 import java.util.List;
 
-public class Repositorio {
+public class Repositorio<T extends Colecionavel>{
 
     private static final String PREFIXO_URL_IMAGENS = "http://www.nossoalbum.com.br/imagens/";
 
     private List<Colecionavel> todasOsColecionaveis;
 
-    private final String tipoDeColecionavel;
+    private ColecionavelFactory fabricaDeColecionaveis;
 
-    public Repositorio(String sufixoUrlImagens, int quantFigurinhas, String tipoDeColecionavel) {
+    private String tipo;
+
+    public Repositorio(String sufixoUrlImagens, int quantFigurinhas, T tipo) {
+        this.tipo = tipo.getClass().getName();
         todasOsColecionaveis = new ArrayList<>(quantFigurinhas);
-        this.tipoDeColecionavel = tipoDeColecionavel;
-        if(tipoDeColecionavel == "selo"){
-            for (int i = 1; i <= quantFigurinhas; i++) {
-                Selo selo = new Selo(i, PREFIXO_URL_IMAGENS + sufixoUrlImagens);
-                todasOsColecionaveis.add(selo);
-            }
-        }
-        else if(tipoDeColecionavel == "figurinha"){
-            for (int i = 1; i <= quantFigurinhas; i++) {
-                Figurinha fig = new Figurinha(i, PREFIXO_URL_IMAGENS + sufixoUrlImagens);
-                todasOsColecionaveis.add(fig);
-            }
-        }
-        else{
-            System.out.println("Tipo de colecionavel não válido!");
+        for (int i = 1; i <= quantFigurinhas; i++) {
+            fabricaDeColecionaveis = new ColecionavelFactory(i, PREFIXO_URL_IMAGENS + sufixoUrlImagens, tipo);
+            todasOsColecionaveis.add(fabricaDeColecionaveis.getInstancia());
         }
 
     }
@@ -35,6 +26,6 @@ public class Repositorio {
     }
 
     public String getTipoDeColecionavel() {
-        return tipoDeColecionavel;
+        return this.tipo;
     }
 }

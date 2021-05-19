@@ -1,7 +1,7 @@
 import java.util.Collection;
 import java.util.Random;
 
-public class Pacotinho {
+public class Pacotinho <T extends Colecionavel> {
 
     private Repositorio repositorio;
     private int[] posicoesDesejadas;
@@ -30,21 +30,21 @@ public class Pacotinho {
         }
     }
 
-    public Colecionavel[] getColecionavel(String tipoDeColecionavel) {
+    public T[] getColecionavel(String tipoDeColecionavel) {
 
         int tamanho = this.posicoesDesejadas.length;
-        Colecionavel colecionaveis[];
+        T colecionaveis[];
 
-        if(tipoDeColecionavel == "figurinha"){
-            colecionaveis = new Figurinha[tamanho];
+        if(tipoDeColecionavel == "Figurinha"){
+            colecionaveis = (T[]) new Figurinha[tamanho];
             for(int i = 0; i < tamanho; i++){
-                colecionaveis[i] = new Figurinha(this.posicoesDesejadas[i], null);
+                colecionaveis[i] = (T) new Figurinha(this.posicoesDesejadas[i], null);
             }
         }
-        else if(tipoDeColecionavel == "selo"){
-            colecionaveis = new Selo[tamanho];
+        else if(tipoDeColecionavel == "Selo"){
+            colecionaveis = (T[]) new Selo[tamanho];
             for(int i = 0; i < tamanho; i++){
-                colecionaveis[i] = new Selo(this.posicoesDesejadas[i], null);
+                colecionaveis[i] = (T) new Selo(this.posicoesDesejadas[i], null);
             }
         }
         else{

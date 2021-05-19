@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Album {
+public class Album<T extends Colecionavel> {
 
     public static final int PERCENTUAL_MINIMO_PARA_AUTO_COMPLETAR = 90;
 
@@ -12,11 +12,13 @@ public class Album {
 
     private int  minimoFigurinhasColadasParaAutoCompletar;
 
-    private final Repositorio repositorio;
+    private final Repositorio<T> repositorio;
     private final int quantItensPorPacotinho;
 
-    private List<Colecionavel> colecionavelColadas;  // direct addressing
+    private List<T> colecionavelColadas;  // direct addressing
     private int quantColecionavelColadas;
+
+    private final String tipoDoRepositorio;
 
     // poderíamos fazer novamente direct addressing para as repetidas,
     // mas vamos usar um HashMap aqui só para treinarmos
@@ -25,6 +27,8 @@ public class Album {
     public Album(Repositorio repositorio, int quantItensPorPacotinho) {
         this.repositorio = repositorio;
         this.quantItensPorPacotinho = quantItensPorPacotinho;
+        this.tipoDoRepositorio = repositorio.getTipoDeColecionavel();
+
 
         int tamanhoFisicoDaLista = getTamanho() + 1;
         this.colecionavelColadas = new ArrayList<>(tamanhoFisicoDaLista);
@@ -41,12 +45,12 @@ public class Album {
     }
 
     public void receberNovoPacotinho(Pacotinho pacotinho) {
-        Colecionavel[] colecionaveisDoPacotinho = pacotinho.getColecionavel(repositorio.getTipoDeColecionavel());
+        T[] colecionaveisDoPacotinho = (T[]) pacotinho.getColecionavel(repositorio.getTipoDeColecionavel());
         if (colecionaveisDoPacotinho.length != this.quantItensPorPacotinho) {
             return;  // melhor ainda: lançaria uma checked exception
         }
 
-        for (Colecionavel cole : pacotinho.getColecionavel(repositorio.getTipoDeColecionavel())) {
+        for (T cole : colecionaveisDoPacotinho) {
             final int posicao = cole.getPosicao();
             if (possuiItemColado(posicao)) {
                 // adiciona como repetida
@@ -68,7 +72,7 @@ public class Album {
         }
     }
 
-    public Colecionavel getItemColado(int posicao) {
+    public T getItemColado(int posicao) {
 
         if (this.possuiItemColado(posicao)) return this.colecionavelColadas.get(posicao);
 
@@ -76,8 +80,8 @@ public class Album {
     }
 
     public boolean possuiItemColado(int posicao) {
-
-        if(posicao > repositorio.getTotalColecionaveis() || posicao <= 0) return false;
+        int tamanho = repositorio.getTotalColecionaveis();
+        if(posicao > tamanho || posicao <= 0) return false;
 
         return this.colecionavelColadas.get(posicao) != null;
     }
@@ -117,11 +121,23 @@ public class Album {
         if(quantColecionavelColadas == 0) return;
 
         if(this.minimoFigurinhasColadasParaAutoCompletar > quantColecionavelColadas) return;
-        for(int i = 1; i < colecionavelColadas.size(); i++){
-            if(this.colecionavelColadas.get(i) == null){
-                Figurinha fig = new Figurinha(i, null);
-                this.colecionavelColadas.set(i, fig);
-                this.quantColecionavelColadas++;
+
+        if(repositorio.getTipoDeColecionavel() == "Figurinha"){
+            for(int i = 1; i < colecionavelColadas.size(); i++){
+                if(this.colecionavelColadas.get(i) == null){
+                    T cole = (T) new Figurinha(i, null);
+                    this.colecionavelColadas.set(i, cole);
+                    this.quantColecionavelColadas++;
+                }
+            }
+        }
+        else if(repositorio.getTipoDeColecionavel() == "Selo"){
+            for(int i = 1; i < colecionavelColadas.size(); i++){
+                if(this.colecionavelColadas.get(i) == null){
+                    T cole = (T) new Selo(i, null);
+                    this.colecionavelColadas.set(i, cole);
+                    this.quantColecionavelColadas++;
+                }
             }
         }
         return;
@@ -133,7 +149,11 @@ public class Album {
                 : IMAGEM_PADRAO_PARA_POSICAO_VAZIA;
     }
 
-//    public static void main(String[] args) {
+    public String getTipoDoRepositorio() {
+        return tipoDoRepositorio;
+    }
+
+    //    public static void main(String[] args) {
 //        ArrayList<Integer> meuArrayList = new ArrayList<>(200);
 //
 //        // inicializa as posições com nulls, para poder acessá-las diretamente
